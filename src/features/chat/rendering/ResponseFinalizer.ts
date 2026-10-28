@@ -96,6 +96,12 @@ export class ResponseFinalizer {
           : msg.durationSeconds === undefined ? t('chat.worked')
             : t('chat.zen.workedFor', { duration: formatWorkDuration(msg.durationSeconds) });
         const history = this.#createDisclosure(wrapper, 'claudian-work-history', label);
+        if (!interrupted && msg.durationSeconds !== undefined) {
+          const header = wrapper.querySelector<HTMLElement>('.claudian-work-header')!;
+          header.classList.add('claudian-response-duration');
+          header.setAttribute('aria-label', t('chat.zen.workedFor', { duration: formatWorkDuration(msg.durationSeconds) }));
+          header.setText(formatWorkDuration(msg.durationSeconds));
+        }
         for (const el of folded) {
           if (getResponseElementKind(el) === 'interrupt') el.remove();
           else history.appendChild(el);

@@ -852,3 +852,20 @@ button.claudian-session-link:focus-visible {
   font-size: var(--font-ui-smaller);
   color: var(--text-muted);
 }
+
+/* Keep completed work accessible from the same row as response throughput. */
+.claudian-message-assistant > .claudian-message-actions-with-duration {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.claudian-message-actions button.claudian-response-duration {
+  margin-inline-start: auto;
+  font-size: var(--font-ui-small);
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.claudian-message-assistant > .claudian-message-actions-with-duration .claudian-message-timestamp {
+  margin-inline-start: 0;
+}

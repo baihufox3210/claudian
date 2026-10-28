@@ -313,7 +313,7 @@ it.each([
     { type: 'user', uuid: 'interrupt', ...second, timestamp: at(), message: { content: [{ type: 'text', text: '[Request interrupted by user]' }] } },
   ]);
   // The first turn completed: it renders as any completed reply does.
-  expect(inspect(messagesEl)).toEqual({ headers: 1, collapsed: `Do the work Worked for 00:01 Requested reply. Task notification ${INTERRUPTED}`,
+  expect(inspect(messagesEl)).toEqual({ headers: 1, collapsed: `Do the work Requested reply. 00:01 Task notification ${INTERRUPTED}`,
     body: 'Automatic reply.' });
 });
 

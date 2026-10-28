@@ -103,6 +103,12 @@ export class MessageActions {
     answer: string | null,
   ): void {
     const toolbar = this.#getOrCreateToolbar(msgEl);
+    const durationButton = msg.durationSeconds !== undefined && !msg.isInterrupt
+      ? toolbar.querySelector<HTMLElement>('.claudian-response-duration')
+        ?? Array.from(this.messagesEl.querySelectorAll<HTMLElement>('[data-work-message-id]'))
+          .find(element => element.dataset.workMessageId === msg.id)
+          ?.querySelector<HTMLElement>('.claudian-response-duration')
+      : null;
     toolbar.empty();
     for (const child of Array.from(contentEl.children)) {
       if (getResponseElementKind(child as HTMLElement) === 'text') {
@@ -124,6 +130,10 @@ export class MessageActions {
       });
     }
     this.appendTimestamp(msgEl, msg.role === 'user' ? msg.timestamp : msg.completedAt);
+    if (durationButton) {
+      toolbar.classList.add('claudian-message-actions-with-duration');
+      toolbar.appendChild(durationButton);
+    }
   }
 
   appendTimestamp(msgEl: HTMLElement, timestampMs: number | undefined): void {
@@ -136,6 +146,7 @@ export class MessageActions {
     }
 
     const timestampEl = toolbar.createDiv({ cls: 'claudian-message-timestamp' });
+    toolbar.insertBefore(timestampEl, toolbar.querySelector('.claudian-response-duration'));
     const timestamp = new Date(timestampMs);
     const label = timestamp.toLocaleTimeString(undefined, {
       hour: '2-digit',

@@ -77,7 +77,7 @@ it.each([false, true])('collapses completed history above the answer and puts co
   renderer.renderMessages(historyMessages, () => 'Hello');
   await Promise.resolve();
   const header = within(messagesEl).getByRole('button', { name: 'Worked for 01:05' });
-  expect(header.hasAttribute('aria-label')).toBe(false);
+  expect(header.getAttribute('aria-label')).toBe('Worked for 01:05');
   expect(header.hasAttribute('title')).toBe(false);
   expect(header.getAttribute('aria-expanded')).toBe('false');
   const history = document.getElementById(header.getAttribute('aria-controls')!)!;
@@ -104,7 +104,7 @@ it.each([false, true])('collapses completed history above the answer and puts co
   const time = copy.parentElement!.querySelector('.claudian-message-timestamp')!;
   expect(copy.parentElement).toBe(forkButton.parentElement);
   expect(copy.parentElement).toBe(time.parentElement);
-  expect(Array.from(copy.parentElement!.children)).toEqual([copy, forkButton, time]);
+  expect(Array.from(copy.parentElement!.children)).toEqual([copy, forkButton, time, header]);
   fireEvent.click(copy);
   fireEvent.click(forkButton);
   await Promise.resolve();
@@ -208,7 +208,7 @@ it('keeps separate completed turns and refreshes timestamps in their own action 
     { id: 'a3', role: 'assistant', content: 'Next answer', timestamp: 7, durationSeconds: 90, completedAt: 10 },
   ], () => 'Hello');
   const headers = within(messagesEl).getAllByRole('button', { name: /Worked for/ });
-  expect(headers.map(header => header.textContent)).toEqual(['Worked for 01:05', 'Worked for 01:30']);
+  expect(headers.map(header => header.textContent)).toEqual(['01:05', '01:30']);
   settings.showMessageTimestamps = false;
   renderer.refreshMessageTimestamps();
   expect(messagesEl.querySelectorAll('.claudian-message-timestamp')).toHaveLength(0);
@@ -217,7 +217,12 @@ it('keeps separate completed turns and refreshes timestamps in their own action 
   renderer.refreshMessageTimestamps();
   const times = messagesEl.querySelectorAll('.claudian-message-timestamp');
   expect(times).toHaveLength(4);
-  for (const time of times) expect(time.parentElement!.lastElementChild).toBe(time);
+  for (const time of times) {
+    const toolbar = time.parentElement!;
+    const duration = toolbar.querySelector('.claudian-response-duration');
+    expect(toolbar.lastElementChild).toBe(duration ?? time);
+    expect(time.nextElementSibling).toBe(duration);
+  }
   renderer.dispose();
 });
 
@@ -480,6 +485,9 @@ it.each(['claude', 'pi', 'opencode', 'codex'])('shows native throughput for %s o
   const response = { ...messages[2], turnStats: { outputTokens: 125, durationMs: 2500 } };
   renderer.renderMessages([messages[0], response], () => 'Hello');
   const stat = within(messagesEl).getByText('50.0 tok/s');
+  const duration = within(messagesEl).getByRole('button', { name: 'Worked for 01:05' });
+  expect(duration.textContent).toBe('01:05');
+  expect(duration.parentElement).toBe(stat.parentElement);
   expect(stat.parentElement).toBe(within(messagesEl).getAllByRole('button', { name: 'Copy message' }).at(-1)!.parentElement);
   // Obsidian renders aria-label tooltips; a title would add a duplicate browser tooltip.
   expect(stat.getAttribute('aria-label')).toBe('125 tokens · 2.5s');
@@ -516,15 +524,16 @@ it('keeps time after throughput when timestamps are refreshed or toggled', () =>
   const toolbar = stat.parentElement!;
   const copy = within(toolbar).getByRole('button', { name: 'Copy message' });
   const fork = within(toolbar).getByRole('button', { name: 'Fork conversation' });
+  const duration = within(toolbar).getByRole('button', { name: 'Worked for 01:05' });
   const expectOrder = () => {
-    expect(Array.from(toolbar.children)).toEqual([copy, fork, stat, toolbar.querySelector('.claudian-message-timestamp')]);
+    expect(Array.from(toolbar.children)).toEqual([copy, fork, stat, toolbar.querySelector('.claudian-message-timestamp'), duration]);
   };
   expectOrder();
   renderer.refreshMessageTimestamps();
   expectOrder();
   settings.showMessageTimestamps = false;
   renderer.refreshMessageTimestamps();
-  expect(Array.from(toolbar.children)).toEqual([copy, fork, stat]);
+  expect(Array.from(toolbar.children)).toEqual([copy, fork, stat, duration]);
   settings.showMessageTimestamps = true;
   renderer.refreshMessageTimestamps();
   renderer.refreshMessageTimestamps();

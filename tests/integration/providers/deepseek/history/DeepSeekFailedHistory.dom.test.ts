@@ -110,7 +110,7 @@ it.each([
   renderer.renderMessages(messages, () => 'Hello');
   await waitFor(() => expect(within(messagesEl).getByText('Committed partial reply')).toBeDefined());
   const view = within(messagesEl);
-  expect(view.queryByRole('button', { name: /^Worked/ })?.textContent ?? null).toBe(completed ? 'Worked for 00:09' : null);
+  expect(view.queryByRole('button', { name: /^Worked/ })?.textContent ?? null).toBe(completed ? '00:09' : null);
   const forkButton = view.queryByRole('button', { name: 'Fork conversation' });
   expect(forkButton !== null).toBe(completed);
   if (forkButton) fireEvent.click(forkButton);

@@ -273,7 +273,7 @@ describe('Pi extension-initiated turns in the chat view', () => {
 
       const [prompted, replyA, replyB] = responseElements(view);
       expect(responseElements(view)).toHaveLength(3);
-      expect(disclosures(prompted)).toEqual([expect.stringMatching(/^Worked for \d\d:\d\d$/), 'Task notification']);
+      expect(disclosures(prompted)).toEqual(['Task notification', expect.stringMatching(/^\d\d:\d\d$/)]);
       expectVisibleAnswer(prompted, 'Prompt answer.');
       const worked = within(prompted).getByRole('button', { name: /^Worked for/ });
       const work = document.getElementById(worked.getAttribute('aria-controls')!)!;
@@ -364,7 +364,7 @@ describe('Pi extension-initiated turns in the chat view', () => {
 
       const [prompted, wake] = responseElements(view);
       expect(responseElements(view)).toHaveLength(2);
-      expect(disclosures(prompted)).toEqual([expect.stringMatching(/^Worked for \d\d:\d\d$/)]);
+      expect(disclosures(prompted)).toEqual([expect.stringMatching(/^\d\d:\d\d$/)]);
       expectVisibleAnswer(prompted, 'Started.');
       expect(disclosures(wake)).toEqual(['Task notification']);
       expectVisibleAnswer(wake, 'Reply C.');

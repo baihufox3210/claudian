@@ -62,7 +62,7 @@ it.each([false, true])('collapses work across compaction on completion and reloa
     for (const element of [before, compact, after]) {
       expect(history.contains(element)).toBe(true);
       expect(element.closest('[hidden]')).toBe(history);
-      expect(header.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(header.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
     }
     expect(before.compareDocumentPosition(compact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(compact.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -121,7 +121,8 @@ it.each(['early', 'late', 'none'])('matches live and JSONL notification order wi
     const answer = within(messagesEl).getByText('Requested answer.');
     const history = document.getElementById(worked.getAttribute('aria-controls')!);
     expect(history!.contains(notification)).toBe(true);
-    expect(worked.compareDocumentPosition(notification) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(worked.compareDocumentPosition(notification) & (response.durationSeconds === undefined
+      ? Node.DOCUMENT_POSITION_FOLLOWING : Node.DOCUMENT_POSITION_PRECEDING)).toBeTruthy();
     return (notification.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
   };
   try {
